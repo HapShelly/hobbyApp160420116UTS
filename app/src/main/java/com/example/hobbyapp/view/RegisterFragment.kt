@@ -41,7 +41,7 @@ class RegisterFragment : Fragment() {
             viewModel.register(newUser)
 
             viewModel.registerSuccessLD.observe(viewLifecycleOwner, Observer {
-                if (it) {
+                if (it == true) {
                     makeAlert(view.context, "Registration Successful!", "You have successfully registered. You may now log in.")
                 } else {
                     makeAlert(view.context, "Registration Failed!", "Registration failed. Please try again.")

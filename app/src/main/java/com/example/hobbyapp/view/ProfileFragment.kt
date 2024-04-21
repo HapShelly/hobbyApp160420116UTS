@@ -57,17 +57,17 @@ class ProfileFragment : Fragment() {
             val lastname = binding.editTextLastname.text.toString()
             val password = binding.editTextPassword.text.toString()
 
-            val newUser:User = if(TextUtils.isEmpty(password)){
-                Log.d("password if", password)
-                User(0,currentUsername!!,null, firstname, lastname)
+            val newUser:User = if (TextUtils.isEmpty(password)) {
+                Log.d("password is empty", password)
+                User(0, currentUsername!!,null, firstname, lastname)
             } else {
-                Log.d("password else", password)
-                User(0,currentUsername!!,password, firstname, lastname)
+                Log.d("password is not empty", password)
+                User(0, currentUsername!!, password, firstname, lastname)
             }
 
             viewModel.updateUser(newUser)
             viewModel.updateSuccessLD.observe(viewLifecycleOwner, Observer {
-                if (it) {
+                if (it == true) {
                     makeAlert(view.context, "Update Successful", "Your profile has been successfully updated.")
                 } else {
                     makeAlert(view.context, "Update Failed", "Failed to update your profile. Please try again later.")

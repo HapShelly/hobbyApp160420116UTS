@@ -46,7 +46,7 @@ class LoginFragment : Fragment() {
 
             viewModel.login(username, password)
             viewModel.loginSuccessLD.observe(viewLifecycleOwner, Observer {
-                if (it) {
+                if (it == true) {
                     var editor: SharedPreferences.Editor = shared.edit()
                     editor.putString(EXTRA_USERNAME,username)
                     editor.apply()
