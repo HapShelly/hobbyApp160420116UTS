@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title">Title</string>
+    <string name="author">by @Author</string>
+    <string name="page">Page</string>
+    <string name="username">Username</string>
+    <string name="logout">LOG OUT</string>
+    <string name="save">SAVE CHANGES</string>
+    <string name="read">READ</string>
+    <string name="error">Error while loading data</string>
+</resources>
