@@ -1,24 +1,32 @@
 package com.example.hobbyapp.model
 
+import android.os.Parcelable
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
-import java.util.Date
+import kotlinx.parcelize.Parcelize
 
-data class News (
-    var id:Int,
-    var title:String,
+@Entity
+@Parcelize
+data class News(
+    @PrimaryKey(autoGenerate = true)
+    var id: Int = 0,
+    var title: String,
     @SerializedName("image")
-    var imgUrl:String,
-    var preview:String?,
-    var content:String?,
-    var author:String,
-    @SerializedName("created_at")
-    var createdAt:Date
-)
+    var imgUrl: String,
+    var preview: String?,
+    var content: String?,
+    var author: String,
+    var createdAt: String?,
+) : Parcelable
 
-data class User (
-    var id:Int,
-    var username:String,
-    var password:String?,
-    var firstname:String,
-    var lastname:String,
+@Entity
+data class User(
+    @PrimaryKey(autoGenerate = true)
+    var id: Int = 0,
+    var username: String,
+    var password: String?,
+    var firstname: String,
+    var lastname: String,
+    var tokenSession: String? = "",
 )

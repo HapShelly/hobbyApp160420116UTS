@@ -1,4 +1,4 @@
-package com.example.hobbyapp.view
+package com.example.hobbyapp.view.news
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -11,12 +11,10 @@ import com.example.hobbyapp.databinding.NewsListItemBinding
 import com.example.hobbyapp.model.News
 import com.example.hobbyapp.util.loadImage
 
-class  NewsListAdapter(private val newsList:ArrayList<News>):RecyclerView.Adapter<NewsListAdapter.NewsViewHolder>() {
-    class NewsViewHolder(var binding: NewsListItemBinding): RecyclerView.ViewHolder(binding.root)
-
+class  NewsListAdapter:RecyclerView.Adapter<NewsListAdapter.NewsViewHolder>() {
+    private val newsList = ArrayList<News>()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsViewHolder {
         val binding = NewsListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-
         return NewsViewHolder(binding)
     }
 
@@ -33,7 +31,7 @@ class  NewsListAdapter(private val newsList:ArrayList<News>):RecyclerView.Adapte
             textPreview.text = news.preview
 
             buttonRead.setOnClickListener {
-                val action = NewsListFragmentDirections.actionNewsDetail(news.id)
+                val action = NewsListFragmentDirections.actionNewsDetail(news)
                 Navigation.findNavController(it).navigate(action)
             }
         }
@@ -48,4 +46,7 @@ class  NewsListAdapter(private val newsList:ArrayList<News>):RecyclerView.Adapte
         newsList.addAll(newestNewsList)
         notifyDataSetChanged()
     }
+
+    class NewsViewHolder(var binding: NewsListItemBinding): RecyclerView.ViewHolder(binding.root)
+
 }

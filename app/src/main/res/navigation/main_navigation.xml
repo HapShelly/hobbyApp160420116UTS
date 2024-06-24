@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/itemListNews"
-        android:name="com.example.hobbyapp.view.NewsListFragment"
+        android:name="com.example.hobbyapp.view.news.NewsListFragment"
         android:label="AllKpop"
         tools:layout="@layout/fragment_news_list">
         <action
@@ -22,7 +22,7 @@
     </fragment>
     <fragment
         android:id="@+id/itemProfile"
-        android:name="com.example.hobbyapp.view.ProfileFragment"
+        android:name="com.example.hobbyapp.view.profile.ProfileFragment"
         android:label="Profile"
         tools:layout="@layout/fragment_profile">
         <action
@@ -33,7 +33,7 @@
     </fragment>
     <fragment
         android:id="@+id/loginFragment"
-        android:name="com.example.hobbyapp.view.LoginFragment"
+        android:name="com.example.hobbyapp.view.login.LoginFragment"
         android:label="fragment_login"
         tools:layout="@layout/fragment_login" >
         <action
@@ -47,24 +47,16 @@
     </fragment>
     <fragment
         android:id="@+id/registerFragment"
-        android:name="com.example.hobbyapp.view.RegisterFragment"
+        android:name="com.example.hobbyapp.view.register.RegisterFragment"
         android:label="fragment_register"
-        tools:layout="@layout/fragment_register" >
-        <action
-            android:id="@+id/actionLoginFromRegister"
-            app:destination="@id/loginFragment"
-            app:popUpToInclusive="false" />
-    </fragment>
+        tools:layout="@layout/fragment_register" />
     <fragment
         android:id="@+id/newsDetailFragment"
-        android:name="com.example.hobbyapp.view.NewsDetailFragment"
+        android:name="com.example.hobbyapp.view.news.NewsDetailFragment"
         android:label="News Detail"
         tools:layout="@layout/fragment_news_detail">
-        <action
-            android:id="@+id/actionNewsListFromDetail"
-            app:destination="@id/itemListNews" />
         <argument
-            android:name="newsid"
-            app:argType="integer" />
+            android:name="data"
+            app:argType="com.example.hobbyapp.model.News" />
     </fragment>
 </navigation>

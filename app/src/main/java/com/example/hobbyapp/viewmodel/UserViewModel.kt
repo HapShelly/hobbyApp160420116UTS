@@ -1,163 +1,85 @@
 package com.example.hobbyapp.viewmodel
 
-import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import com.android.volley.RequestQueue
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
-import com.example.hobbyapp.global.Global
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.hobbyapp.model.AppDB
 import com.example.hobbyapp.model.User
-import com.google.gson.Gson
-import org.json.JSONObject
+import kotlinx.coroutines.launch
+import kotlin.random.Random
 
-class UserViewModel(application: Application):AndroidViewModel(application) {
-    var userLD = MutableLiveData<User>()
-    var registerSuccessLD = MutableLiveData<Boolean>()
-    var loginSuccessLD = MutableLiveData<Boolean>()
-    var updateSuccessLD = MutableLiveData<Boolean>()
+class UserViewModel(private val roomDb: AppDB) : ViewModel() {
+    val error = MutableLiveData<String>()
+    val msg = MutableLiveData<String>()
+    val user = MutableLiveData<User?>()
 
-    val TAG = "volleyTag"
-    private var queue: RequestQueue? = null
-    fun register(user:User){
+    var firstname: String = ""
+    var lastname: String = ""
+    var username: String = ""
+    var password: String = ""
 
-        queue = Volley.newRequestQueue(getApplication())
-        val url = "${Global.baseUrl}/register.php"
-
-        val stringRequest = object:StringRequest(
-            Method.POST, url, {
-                val result = JSONObject(it)
-                registerSuccessLD.value = result.getString("status") == "success"
-            },
-            {
-                registerSuccessLD.value = false
-            }
-        )
-        {
-            override fun getParams(): MutableMap<String, String>? {
-                val hashMap = HashMap<String, String>()
-
-                hashMap["username"] = user.username
-                user.password?.let { hashMap.put("password", it) }
-                hashMap["firstname"] = user.firstname
-                hashMap["lastname"] = user.lastname
-
-                return hashMap
-            }
-        }
-
-        stringRequest.tag = TAG
-        queue?.add(stringRequest)
-    }
-
-    fun login(username:String, password:String){
-        queue = Volley.newRequestQueue(getApplication())
-        val url = "${Global.baseUrl}/login.php"
-
-        val stringRequest = object:StringRequest(
-            Method.POST, url, {
-                val result = JSONObject(it)
-                Log.d("login success", result.toString())
-
-                loginSuccessLD.value = result.getString("status") == "success"
-            },
-            {
-                Log.d("login error", it.toString())
-                loginSuccessLD.value = false
-            }
-        )
-        {
-            override fun getParams(): MutableMap<String, String>? {
-                val hashMap = HashMap<String, String>()
-
-                hashMap["username"] = username
-                hashMap["password"] = password
-
-                return hashMap
-            }
-        }
-
-        stringRequest.tag = TAG
-        queue?.add(stringRequest)
-    }
-
-    fun fetch(username:String){
-        queue = Volley.newRequestQueue(getApplication())
-        val url = "${Global.baseUrl}/getuser.php"
-
-        val stringRequest = object:StringRequest(
-            Method.POST, url, {
-                val obj = JSONObject(it)
-                if (obj.getString("status") == "success"){
-                    val user = Gson().fromJson(obj.getString("data"), User::class.java)
-                    Log.d("user obj",user.toString())
-
-                    userLD.value = user
+    fun login() {
+        try {
+            val result = roomDb.userDao().loginUser(username, password)
+            viewModelScope.launch {
+                if (result != null) {
+                    result.tokenSession = "${Random.nextFloat()}+${result.username}"
+                    user.value = result
+                } else {
+                    error.value = "User Not Found"
                 }
-                Log.d("get user", it.toString())
-            },
-            {
-                Log.d("get user error", it.toString())
             }
-        )
-        {
-            override fun getParams(): MutableMap<String, String>? {
-                val hashMap = HashMap<String, String>()
-                hashMap["username"] = username
-                return hashMap
+        } catch (e: Exception) {
+            viewModelScope.launch {
+                error.value = "User Not Found"
             }
         }
+    }
 
-        stringRequest.tag = TAG
-        queue?.add(stringRequest)
+
+    fun register() {
+        val user = User(
+            firstname = firstname,
+            lastname = lastname,
+            username = username,
+            password = password
+        )
+        try {
+            roomDb.userDao().insertUser(user)
+            viewModelScope.launch {
+                msg.value = "Register Success"
+            }
+        } catch (e: Exception) {
+            viewModelScope.launch {
+                error.value = e.localizedMessage ?: "Undefined Error"
+            }
+            return
+        }
     }
 
     fun updateUser(newUser: User){
-        queue = Volley.newRequestQueue(getApplication())
-        val url = "${Global.baseUrl}/updateuser.php"
+        try {
+            roomDb.userDao().updateUser(newUser)
+        } catch (e: Exception) {
+            return
+        }
+    }
 
-        val stringRequest = object:StringRequest(
-            Method.POST, url, {
-                Log.d("update user", it.toString())
-                val obj = JSONObject(it)
-
-                if (obj.getString("status") == "success"){
-                    Log.d("update success",it.toString())
-                    updateSuccessLD.value = true
-                } else {
-                    updateSuccessLD.value = false
-                }
-            },
-            {
-                updateSuccessLD.value = false
-
-                Log.d("update user error", it.toString())
+    fun getUser(id: Int) {
+        try {
+            val result = roomDb.userDao().getUserById(id)
+            viewModelScope.launch {
+                user.value = result
             }
-        )
-        {
-            override fun getParams(): MutableMap<String, String>? {
-                val hashMap = HashMap<String, String>()
-
-                hashMap["username"] = newUser.username
-                hashMap["firstname"] = newUser.firstname
-                hashMap["lastname"] = newUser.lastname
-
-                newUser.password?.let {
-                    Log.d("new password", newUser.password!!)
-                    hashMap["password"]= newUser.password!!
-                }
-
-                return hashMap
+        } catch (e: Exception) {
+            viewModelScope.launch {
+                msg.value = e.localizedMessage ?: ""
             }
         }
-
-        stringRequest.tag = TAG
-        queue?.add(stringRequest)
     }
 
     override fun onCleared() {
         super.onCleared()
-        queue?.cancelAll(TAG)
     }
 }
